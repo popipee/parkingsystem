@@ -88,13 +88,12 @@ public class FareCalculatorServiceTest {
         assertThrows(NullPointerException.class, () -> fareCalculatorServiceUnderTest.calculateFare(ticket));
     }
 
-    @Disabled
     @DisplayName("Calculate the fare for a bike for an incoming date which is after an outgoing one.")
     @Test
     public void calculate_FareBikeWithFutureInTimeOf1Hour_ShouldReturnIllegalArgumentException(){
         //GIVEN
         LocalDateTime inTime  = LocalDateTime.now();
-        inTime.plusHours(1);
+        inTime = inTime.plusHours(1);
         LocalDateTime outTime  = LocalDateTime.now();
         ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.BIKE,false);
 
