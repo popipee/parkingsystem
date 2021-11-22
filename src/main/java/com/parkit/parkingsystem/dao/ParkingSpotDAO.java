@@ -16,6 +16,39 @@ public class ParkingSpotDAO {
 
     public DataBaseConfig dataBaseConfig = new DataBaseConfig();
 
+    public ParkingSpot getParkingSpot(Integer parkingNumber){
+        Connection con = null;
+        ParkingSpot parkingSpot = null;
+        try{
+            con = dataBaseConfig.getConnection();
+            PreparedStatement ps = con.prepareStatement(DBConstants.GET_PARKING_SPOT);
+            //PARKING_NUMBER, AVAILABLE, TYPE
+            ps.setString(1,(parkingNumber.toString()));
+            ResultSet rs = ps.executeQuery();
+            if(rs.next()){
+                parkingSpot = new ParkingSpot();
+                parkingSpot.setId(parkingNumber);
+                parkingSpot.setAvailable(rs.getBoolean("AVAILABLE"));
+                if(rs.getString("TYPE").equals(ParkingType.CAR.name())){
+                    parkingSpot.setParkingType(ParkingType.CAR);
+                }
+                else if(rs.getString("TYPE").equals(ParkingType.BIKE.name())){
+                    parkingSpot.setParkingType(ParkingType.BIKE);
+                }
+                else{
+                    throw new IllegalArgumentException("Error fetching ParkingType from DB");
+                }
+            }
+            dataBaseConfig.closeResultSet(rs);
+            dataBaseConfig.closePreparedStatement(ps);
+        } catch (Exception ex){
+            logger.error("Error in fetching the parkingSpot",ex);
+        } finally{
+            dataBaseConfig.closeConnection(con);
+            return parkingSpot;
+        }
+    }
+
     public int getNextAvailableSlot(ParkingType parkingType){
         Connection con = null;
         int result=-1;

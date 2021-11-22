@@ -6,8 +6,10 @@ import com.parkit.parkingsystem.model.ParkingSpot;
 import com.parkit.parkingsystem.model.Ticket;
 import com.parkit.parkingsystem.service.FareCalculatorService;
 import org.junit.jupiter.api.*;
+import org.mockito.BDDMockito;
 import org.mockito.Mock;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDateTime;
@@ -167,4 +169,23 @@ public class FareCalculatorServiceTest {
         assertEquals( (24 * Fare.CAR_RATE_PER_HOUR) , ticket.getPrice());
     }
 
+    @DisplayName("As a user, I want to be able to park for 30 minutes or less without having to pay.")
+    @Test
+    public void calculate_FareForACarWithAParkingTimeOf30Minutes_ShouldReturnAFreeTicketPrice(){
+        //GIVEN
+        LocalDateTime inTime  = LocalDateTime.now();
+        inTime = inTime.minusMinutes(30);
+        LocalDateTime outTime  = LocalDateTime.now();
+        ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR,false);
+
+        ticket.setInTime(inTime);
+        ticket.setOutTime(outTime);
+        ticket.setParkingSpot(parkingSpot);
+
+        //WHEN
+        fareCalculatorServiceUnderTest.calculateFare(ticket);
+
+        //THEN
+        assertThat(ticket.getPrice()).isEqualTo(0);
+    }
 }

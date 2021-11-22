@@ -1,9 +1,11 @@
 package com.parkit.parkingsystem.integration;
 
+import com.parkit.parkingsystem.constants.ParkingType;
 import com.parkit.parkingsystem.dao.ParkingSpotDAO;
 import com.parkit.parkingsystem.dao.TicketDAO;
 import com.parkit.parkingsystem.integration.config.DataBaseTestConfig;
 import com.parkit.parkingsystem.integration.service.DataBasePrepareService;
+import com.parkit.parkingsystem.model.ParkingSpot;
 import com.parkit.parkingsystem.model.Ticket;
 import com.parkit.parkingsystem.service.ParkingService;
 import com.parkit.parkingsystem.util.InputReaderUtil;
@@ -53,42 +55,45 @@ public class ParkingDataBaseIT {
     }
 
     @Order(1)
-    @DisplayName("Test intime is populated properly in database for a car")
+    @DisplayName("Test intime is populated properly in database for a car an parking slot is not available")
     @Test
-    public void testParkingACar() {
+    public void testParkingACar() throws Exception{
         //GIVEN
         ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
         Ticket ticket = new Ticket();
+        ParkingSpot parkingSpot = new ParkingSpot();
 
         //WHEN
         parkingService.processIncomingVehicle();
-        ticket = ticketDAO.getTicket("ABCDEF");
+        ticket = ticketDAO.getTicket(inputReaderUtil.readVehicleRegistrationNumber());
+        parkingSpot = parkingSpotDAO.getParkingSpot(ticket.getParkingSpot().getId());
 
         //THEN
         assertThat(ticket.getInTime()).isNotNull();
-        //Could create error if the test last longer than a minute
-//        assertThat(ticket.getInTime().getHour()).isEqualTo(LocalDateTime.now().getHour());
-//        assertThat(ticket.getInTime().getMinute()).isEqualTo(LocalDateTime.now().getMinute()); //Could create error if the test last longer than a minute
-
-        //check manually that a ticket is actually saved in DB and Parking table is updated with availability
+        assertThat(parkingSpot.isAvailable()).isFalse();
     }
 
     @Order(2)
-    @DisplayName("Test outime and price are populated properly in database for a car")
+    @DisplayName("Test outime and price are properly populated in database and parking slot is free")
     @Test
     public void testParkingLotExit() throws Exception{
         //GIVEN
         testParkingACar(); //Creation of a car
         ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
         Ticket ticket = new Ticket();
+        ParkingSpot parkingSpot = new ParkingSpot();
+
 
         //WHEN
         parkingService.processExitingVehicle();
-        ticket = ticketDAO.getTicket("ABCDEF");
+        ticket = ticketDAO.getTicket(inputReaderUtil.readVehicleRegistrationNumber());
+        parkingSpot = parkingSpotDAO.getParkingSpot(ticket.getParkingSpot().getId());
+
 
         //THEN
         assertThat(ticket.getOutTime()).isNotNull();
         assertThat(ticket.getPrice()).isNotNull();
+        assertThat(parkingSpot.isAvailable()).isTrue();
     }
 
 }
