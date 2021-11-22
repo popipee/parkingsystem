@@ -11,6 +11,7 @@ public class Ticket {
     private double price;
     private LocalDateTime inTime;
     private LocalDateTime outTime;
+    private boolean alreadyExists;
 
     public int getId() {
         return id;
@@ -58,5 +59,13 @@ public class Ticket {
 
     public void setOutTime(LocalDateTime outTime) {
         this.outTime = outTime;
+    }
+
+    public boolean getAlreadyExists() {
+        return alreadyExists;
+    }
+
+    public void setAlreadyExists(boolean exists) {
+        this.alreadyExists = exists;
     }
 }

@@ -19,7 +19,7 @@ public class ParkingService {
 
     private InputReaderUtil inputReaderUtil;
     private ParkingSpotDAO parkingSpotDAO;
-    private  TicketDAO ticketDAO;
+    private TicketDAO ticketDAO;
 
     public ParkingService(InputReaderUtil inputReaderUtil, ParkingSpotDAO parkingSpotDAO, TicketDAO ticketDAO){
         this.inputReaderUtil = inputReaderUtil;
@@ -104,6 +104,8 @@ public class ParkingService {
             LocalDateTime outTime = LocalDateTime.now();
             ticket.setOutTime(outTime);
             fareCalculatorService.calculateFare(ticket);
+
+            //update parking spot after having updated ticket
             if(ticketDAO.updateTicket(ticket)) {
                 ParkingSpot parkingSpot = ticket.getParkingSpot();
                 parkingSpot.setAvailable(true);

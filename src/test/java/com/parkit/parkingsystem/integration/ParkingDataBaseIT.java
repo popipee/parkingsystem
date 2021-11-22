@@ -14,11 +14,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ExtendWith(MockitoExtension.class)
 public class ParkingDataBaseIT {
 
@@ -26,6 +28,8 @@ public class ParkingDataBaseIT {
     private static ParkingSpotDAO parkingSpotDAO;
     private static TicketDAO ticketDAO;
     private static DataBasePrepareService dataBasePrepareService;
+    private Ticket ticket;
+    private ParkingSpot parkingSpot;
 
     @Mock
     private static InputReaderUtil inputReaderUtil;
@@ -46,22 +50,16 @@ public class ParkingDataBaseIT {
         when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF"); //mock reader selection so it always return ABCDEF when reading registration number
         dataBasePrepareService.clearDataBaseEntries(); //clear database entries to prepare for future sql request
 
+        Ticket ticket = new Ticket();
+        ParkingSpot parkingSpot = new ParkingSpot();
     }
 
-
-    @AfterAll
-    private static void tearDown(){
-        //TODO : EFE - what is this ? to be erased ?
-    }
-
-    @Order(1)
     @DisplayName("Test intime is populated properly in database for a car an parking slot is not available")
     @Test
+    @Order(1)
     public void testParkingACar() throws Exception{
         //GIVEN
         ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
-        Ticket ticket = new Ticket();
-        ParkingSpot parkingSpot = new ParkingSpot();
 
         //WHEN
         parkingService.processIncomingVehicle();
@@ -73,27 +71,51 @@ public class ParkingDataBaseIT {
         assertThat(parkingSpot.isAvailable()).isFalse();
     }
 
-    @Order(2)
     @DisplayName("Test outime and price are properly populated in database and parking slot is free")
     @Test
+    @Order(2)
     public void testParkingLotExit() throws Exception{
         //GIVEN
         testParkingACar(); //Creation of a car
+        Thread.sleep(100);
         ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
-        Ticket ticket = new Ticket();
-        ParkingSpot parkingSpot = new ParkingSpot();
-
 
         //WHEN
         parkingService.processExitingVehicle();
         ticket = ticketDAO.getTicket(inputReaderUtil.readVehicleRegistrationNumber());
         parkingSpot = parkingSpotDAO.getParkingSpot(ticket.getParkingSpot().getId());
 
-
         //THEN
         assertThat(ticket.getOutTime()).isNotNull();
         assertThat(ticket.getPrice()).isNotNull();
         assertThat(parkingSpot.isAvailable()).isTrue();
     }
+
+    //TODO : 5 percent discount test with DB
+//    @DisplayName("Apply a 5 percent discount on an already existing ticket")
+//    @Test
+//    @Order(3)
+//    public void Test_AParkingLotExitForARecurringUser_ShouldReturnAPriceWithA5PercentDiscount() throws Exception{
+//        //GIVEN
+//        //Car comes in and goes out;
+//        testParkingLotExit();
+//        //Then it comes again
+//        testParkingACar();
+//
+//        ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+//        Ticket ticket = new Ticket();
+//        ParkingSpot parkingSpot = new ParkingSpot();
+//
+//
+//        //WHEN
+//        parkingService.processExitingVehicle();
+//        ticket = ticketDAO.getTicket(inputReaderUtil.readVehicleRegistrationNumber());
+//
+//
+//
+//        //THEN
+//
+//
+//    }
 
 }

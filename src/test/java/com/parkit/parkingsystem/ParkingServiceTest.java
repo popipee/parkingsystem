@@ -7,24 +7,21 @@ import com.parkit.parkingsystem.model.ParkingSpot;
 import com.parkit.parkingsystem.model.Ticket;
 import com.parkit.parkingsystem.service.ParkingService;
 import com.parkit.parkingsystem.util.InputReaderUtil;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class ParkingServiceTest {
 
-    private static ParkingService parkingService;
+    private static ParkingService parkingServiceUnderTest;
 
     @Mock
     private static InputReaderUtil inputReaderUtil;
@@ -39,6 +36,7 @@ public class ParkingServiceTest {
             when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
 
             ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR,false);
+
             Ticket ticket = new Ticket();
             ticket.setInTime(LocalDateTime.now().minusHours(1));
             ticket.setParkingSpot(parkingSpot);
@@ -48,24 +46,52 @@ public class ParkingServiceTest {
 
             when(parkingSpotDAO.updateParking(any(ParkingSpot.class))).thenReturn(true);
 
-            parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+            parkingServiceUnderTest = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
         } catch (Exception e) {
             e.printStackTrace();
             throw  new RuntimeException("Failed to set up test mock objects");
         }
     }
 
-    //TODO : EFE - put a name for this test
-    @DisplayName("put a name here")
+    @DisplayName("check if exiting vehicles calls for tickets update and parking spot update")
     @Test
     public void processExitingVehicleTest(){
         //GIVEN
 
         //WHEN
-        parkingService.processExitingVehicle();
+        parkingServiceUnderTest.processExitingVehicle();
 
         //THEN
         verify(parkingSpotDAO, Mockito.times(1)).updateParking(any(ParkingSpot.class));
+        verify(ticketDAO, Mockito.times(1)).updateTicket(any(Ticket.class));
+    }
+
+
+    @DisplayName("Check if incoming vehicles calls for tickets update and parking spot update")
+    @Test
+    public void processIncomingVehicle(){
+        //GIVEN
+
+        //WHEN
+        parkingServiceUnderTest.processExitingVehicle();
+
+        //THEN
+        verify(parkingSpotDAO, Mockito.times(1)).updateParking(any(ParkingSpot.class));
+        verify(ticketDAO, Mockito.times(1)).updateTicket(any(Ticket.class));
+    }
+
+    @Disabled
+    @DisplayName("Get the next parking number available")
+    @Test
+    public void check_ForANewIncomingCarTheNextAvailableCarPark_ShouldReturnAParkingSpot () {
+        //GIVEN
+
+        //WHEN
+        parkingServiceUnderTest.getNextParkingNumberIfAvailable();
+
+        //THEN
+        verify(parkingSpotDAO,Mockito.times(1)).getNextAvailableSlot(any(ParkingType.class));
+        //TODO : this test does not pass
     }
 
 }
