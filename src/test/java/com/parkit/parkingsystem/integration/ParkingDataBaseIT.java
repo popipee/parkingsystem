@@ -76,9 +76,10 @@ public class ParkingDataBaseIT {
     @Order(2)
     public void testParkingLotExit() throws Exception{
         //GIVEN
-        testParkingACar(); //Creation of a car
-        Thread.sleep(100);
+        testParkingACar();
         ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+
+
 
         //WHEN
         parkingService.processExitingVehicle();
