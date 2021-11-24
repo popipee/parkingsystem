@@ -22,8 +22,7 @@ public class TicketDAO {
         try {
             con = dataBaseConfig.getConnection();
             PreparedStatement ps = con.prepareStatement(DBConstants.SAVE_TICKET);
-            //ID, PARKING_NUMBER, VEHICLE_REG_NUMBER, PRICE, IN_TIME, OUT_TIME)
-            //ps.setInt(1,ticket.getId());
+            //PARKING_NUMBER, VEHICLE_REG_NUMBER, PRICE, IN_TIME, OUT_TIME)
             ps.setInt(1,ticket.getParkingSpot().getId());
             ps.setString(2, ticket.getVehicleRegNumber());
             ps.setDouble(3, ticket.getPrice());
@@ -41,21 +40,33 @@ public class TicketDAO {
     public Ticket getTicket(String vehicleRegNumber) {
         Connection con = null;
         Ticket ticket = null;
+
         try {
             con = dataBaseConfig.getConnection();
-            PreparedStatement ps = con.prepareStatement(DBConstants.GET_TICKET);
-            //ID, PARKING_NUMBER, VEHICLE_REG_NUMBER, PRICE, IN_TIME, OUT_TIME)
+            //Prepared Statement ordered parameters: VEHICULE_REG_NUMBER
+            PreparedStatement ps = con.prepareStatement(DBConstants.GET_TICKETS,ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_READ_ONLY);
             ps.setString(1,vehicleRegNumber);
+            //Result Statement ordered parameters : PARKING_NUMBER, ID, PRICE, IN_TIME, OUT_TIME, TYPE
             ResultSet rs = ps.executeQuery();
+
+            //rs.next is used to move the cursor of the result set to the first row. Here the GET_TICKETS will giv us the last ticket so it is okay to read only first row
             if(rs.next()){
                 ticket = new Ticket();
-                ParkingSpot parkingSpot = new ParkingSpot(rs.getInt(1), ParkingType.valueOf(rs.getString(6)),false);
+                ParkingSpot parkingSpot = new ParkingSpot(
+                        rs.getInt("PARKING_NUMBER"),
+                        ParkingType.valueOf(rs.getString("TYPE")),
+                        false);
                 ticket.setParkingSpot(parkingSpot);
-                ticket.setId(rs.getInt(2));
+                ticket.setId(rs.getInt("ID"));
                 ticket.setVehicleRegNumber(vehicleRegNumber);
-                ticket.setPrice(rs.getDouble(3));
-                ticket.setInTime(rs.getTimestamp(4).toLocalDateTime());
-                ticket.setOutTime((rs.getTimestamp(5) == null )?null:rs.getTimestamp(5).toLocalDateTime());
+                ticket.setPrice(rs.getDouble("PRICE"));
+                ticket.setInTime(rs.getTimestamp("IN_TIME").toLocalDateTime());
+                ticket.setOutTime((rs.getTimestamp("OUT_TIME") == null )?null:rs.getTimestamp("OUT_TIME").toLocalDateTime());
+
+                //Check if there are more than one row in the result set which means the vehicleRegNumber has come more than once in the parking
+                rs.last();
+                if(rs.getRow()>1){ticket.setAlreadyExists(true);}
+                else{ticket.setAlreadyExists(false);}
             }
             dataBaseConfig.closeResultSet(rs);
             dataBaseConfig.closePreparedStatement(ps);

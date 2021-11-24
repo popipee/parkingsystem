@@ -47,6 +47,7 @@ public class ParkingServiceTest {
             when(parkingSpotDAO.updateParking(any(ParkingSpot.class))).thenReturn(true);
 
             parkingServiceUnderTest = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+
         } catch (Exception e) {
             e.printStackTrace();
             throw  new RuntimeException("Failed to set up test mock objects");
@@ -80,18 +81,16 @@ public class ParkingServiceTest {
         verify(ticketDAO, Mockito.times(1)).updateTicket(any(Ticket.class));
     }
 
-    @Disabled
-    @DisplayName("Get the next parking number available")
+    @DisplayName("Check if a recurring customer benefits from a 5% discount")
     @Test
-    public void check_ForANewIncomingCarTheNextAvailableCarPark_ShouldReturnAParkingSpot () {
+    public void OutgoingVehicle_ForARecurringUser_ShouldBenefitFromA5PercentDiscount(){
         //GIVEN
 
+
         //WHEN
-        parkingServiceUnderTest.getNextParkingNumberIfAvailable();
 
         //THEN
-        verify(parkingSpotDAO,Mockito.times(1)).getNextAvailableSlot(any(ParkingType.class));
-        //TODO : this test does not pass
+
     }
 
 }

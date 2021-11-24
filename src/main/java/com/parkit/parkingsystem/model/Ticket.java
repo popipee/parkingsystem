@@ -1,8 +1,6 @@
 package com.parkit.parkingsystem.model;
 
 import java.time.LocalDateTime;
-import java.util.Calendar;
-import java.util.Date;
 
 public class Ticket {
     private int id;
