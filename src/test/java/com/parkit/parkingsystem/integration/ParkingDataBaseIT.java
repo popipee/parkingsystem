@@ -1,11 +1,13 @@
 package com.parkit.parkingsystem.integration;
 
+import com.parkit.parkingsystem.constants.Fare;
 import com.parkit.parkingsystem.dao.ParkingSpotDAO;
 import com.parkit.parkingsystem.dao.TicketDAO;
 import com.parkit.parkingsystem.integration.config.DataBaseTestConfig;
 import com.parkit.parkingsystem.integration.service.DataBasePrepareService;
 import com.parkit.parkingsystem.model.ParkingSpot;
 import com.parkit.parkingsystem.model.Ticket;
+import com.parkit.parkingsystem.service.FareCalculatorService;
 import com.parkit.parkingsystem.service.ParkingService;
 import com.parkit.parkingsystem.util.InputReaderUtil;
 import org.junit.jupiter.api.*;
@@ -71,7 +73,7 @@ public class ParkingDataBaseIT {
         assertThat(parkingSpot.isAvailable()).isFalse();
     }
 
-    @DisplayName("Test outime and price are properly populated in database and parking slot is free")
+    @DisplayName("Test outTime and price are properly populated in database and parking slot is free")
     @Test
     @Order(2)
     public void testParkingLotExit() throws Exception{
@@ -95,61 +97,81 @@ public class ParkingDataBaseIT {
         assertThat(parkingSpot.isAvailable()).isTrue();
     }
 
-
-    @DisplayName("Multiple cars with recurring users")
+    @Disabled
+    @DisplayName("Testing 5% discount for a recurring car. REAL so it lasts 45min")
     @Test
-    private void testMultipleEnteringWithRecurringUser() throws Exception{
+    @Order(3)
+    public void testReal5PercentDiscountEntering() throws Exception{
         //We Spy on LocalDateTime time to manipulate time int database writing
-
 
         //-------------GIVEN----------------
         ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
         //---INCOMING---
         //-CAR1
-        //Mocking a car in row 1 and Reg ABCDEF
+        //Mocking a car registered ABCDEF
         Mockito.doReturn("ABCDEF").when(inputReaderUtil).readVehicleRegistrationNumber(); //mock reader selection, so it always returns 'ABCDEF' when reading registration number
         Mockito.doReturn(1).when(inputReaderUtil).readSelection(); //mock reader selection, so it always chooses type 1 (i.e. CAR)
-        when(LocalDateTime.now()).thenReturn(LocalDateTime.now().minusHours(2));
-        //Creating Car
         parkingService.processIncomingVehicle();
-
-        //-CAR2
-        //Mocking a car in row 1 and Reg AZERTY
-        when(inputReaderUtil.readSelection()).thenReturn(1); //mock reader selection, so it always chooses type 1 (i.e. CAR)
-        when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("AZERTY"); //mock reader selection, so it always returns 'ABCDEF' when reading registration number
-        parkingService.processIncomingVehicle();
-        Ticket ticket2 = new Ticket();
-        ticket2 = ticketDAO.getTicket(inputReaderUtil.readVehicleRegistrationNumber());
-
-        //-CAR3
-        //Mocking a car in row 1 and Reg UIOP
-        when(inputReaderUtil.readSelection()).thenReturn(1); //mock reader selection, so it always chooses type 1 (i.e. CAR)
-        when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("UIOP"); //mock reader selection, so it always returns 'ABCDEF' when reading registration number
-        parkingService.processIncomingVehicle();
-        Ticket ticket3 = new Ticket();
-        ticket3 = ticketDAO.getTicket(inputReaderUtil.readVehicleRegistrationNumber());
+        Thread.sleep(1000);
 
         //---EXITING/ENTERING---
-        //-CAR1
-        //Mocking a car in row 1 and Reg ABCDEF
-        Mockito.doReturn("ABCDEF").when(inputReaderUtil).readVehicleRegistrationNumber(); //mock reader selection, so it always returns 'ABCDEF' when reading registration number
-        Mockito.doReturn(1).when(inputReaderUtil).readSelection(); //mock reader selection, so it always chooses type 1 (i.e. CAR)
-        //Creating Car
         parkingService.processExitingVehicle();
         Thread.sleep(1000);
         parkingService.processIncomingVehicle();
-        Thread.sleep(1000);
+        Thread.sleep(45*60*1000);
 
         //-------------WHEN----------------
         parkingService.processExitingVehicle();
-        Thread.sleep(1000);
         ticket = ticketDAO.getTicket(inputReaderUtil.readVehicleRegistrationNumber());
 
         //-------------THEN----------------
         assertThat(ticket.getAlreadyExists()).isTrue();
-        assertThat(ticket2.getAlreadyExists()).isFalse();
-        assertThat(ticket3.getAlreadyExists()).isFalse();
+        assertThat(ticket.getPrice()).isEqualTo(0.75 * Fare.CAR_RATE_PER_HOUR * 0.95);
 
+    }
+
+    @DisplayName("Testing 5% discount for a recurring car.")
+    @Test
+    @Order(4)
+    public void testSimulated5PercentDiscountEntering() throws Exception{
+        //We Spy on LocalDateTime time to manipulate time int database writing
+
+        //-------------GIVEN----------------
+        ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+        Ticket ticketNumberTwo = new Ticket();
+        //---INCOMING---
+        //-CAR1
+        //Mocking a car registered ABCDEF
+        Mockito.doReturn("ABCDEF").when(inputReaderUtil).readVehicleRegistrationNumber(); //mock reader selection, so it always returns 'ABCDEF' when reading registration number
+        Mockito.doReturn(1).when(inputReaderUtil).readSelection(); //mock reader selection, so it always chooses type 1 (i.e. CAR)
+        parkingService.processIncomingVehicle();
+        ticket = ticketDAO.getTicket(inputReaderUtil.readVehicleRegistrationNumber());
+        ticket.setInTime(ticket.getInTime().minusMinutes(45));
+        ticketDAO.updateTicketInTime(ticket);
+
+
+        //---EXITING/ENTERING---
+        parkingService.processExitingVehicle();
+        ticket = ticketDAO.getTicket(inputReaderUtil.readVehicleRegistrationNumber());
+
+        Thread.sleep(1000);
+
+        parkingService.processIncomingVehicle();
+
+        //---Modifying Database incoming Ticket---
+        //--First ticket to be modified (need top modify this one because if not, it would be anterior to last ticket afterwards)
+
+        //--Second Ticket
+
+        //-------------WHEN----------------
+        parkingService.processExitingVehicleSpecialDate(LocalDateTime.now().plusMinutes(45));
+        ticketNumberTwo = ticketDAO.getTicket(inputReaderUtil.readVehicleRegistrationNumber());
+
+        //-------------THEN----------------
+        assertThat(ticket.getAlreadyExists()).isFalse();
+        assertThat(ticket.getPrice()).isEqualTo(0.75 * Fare.CAR_RATE_PER_HOUR);
+        assertThat(ticketNumberTwo.getAlreadyExists()).isTrue();
+        assertThat(ticketNumberTwo.getPrice()).isEqualTo(0.75 * Fare.CAR_RATE_PER_HOUR * 0.95);
     }
 
 }
