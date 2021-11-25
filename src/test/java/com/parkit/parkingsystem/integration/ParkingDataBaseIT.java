@@ -7,7 +7,6 @@ import com.parkit.parkingsystem.integration.config.DataBaseTestConfig;
 import com.parkit.parkingsystem.integration.service.DataBasePrepareService;
 import com.parkit.parkingsystem.model.ParkingSpot;
 import com.parkit.parkingsystem.model.Ticket;
-import com.parkit.parkingsystem.service.FareCalculatorService;
 import com.parkit.parkingsystem.service.ParkingService;
 import com.parkit.parkingsystem.util.InputReaderUtil;
 import org.junit.jupiter.api.*;
@@ -52,6 +51,7 @@ public class ParkingDataBaseIT {
         ParkingSpot parkingSpot = new ParkingSpot();
     }
 
+
     @DisplayName("Test inTime is populated properly in database for a car an parking slot is not available")
     @Test
     @Order(1)
@@ -72,6 +72,7 @@ public class ParkingDataBaseIT {
         assertThat(ticket.getInTime()).isNotNull();
         assertThat(parkingSpot.isAvailable()).isFalse();
     }
+
 
     @DisplayName("Test outTime and price are properly populated in database and parking slot is free")
     @Test
@@ -144,24 +145,15 @@ public class ParkingDataBaseIT {
         //Mocking a car registered ABCDEF
         Mockito.doReturn("ABCDEF").when(inputReaderUtil).readVehicleRegistrationNumber(); //mock reader selection, so it always returns 'ABCDEF' when reading registration number
         Mockito.doReturn(1).when(inputReaderUtil).readSelection(); //mock reader selection, so it always chooses type 1 (i.e. CAR)
-        parkingService.processIncomingVehicle();
-        ticket = ticketDAO.getTicket(inputReaderUtil.readVehicleRegistrationNumber());
-        ticket.setInTime(ticket.getInTime().minusMinutes(45));
-        ticketDAO.updateTicketInTime(ticket);
-
+        parkingService.processIncomingVehicleSpecialInTimeDate(LocalDateTime.now().minusMinutes(45));
+//        ticket = ticketDAO.getTicket(inputReaderUtil.readVehicleRegistrationNumber());
+//        ticket.setInTime(ticket.getInTime().minusMinutes(45));
+//        ticketDAO.updateTicketInTime(ticket);
 
         //---EXITING/ENTERING---
         parkingService.processExitingVehicle();
         ticket = ticketDAO.getTicket(inputReaderUtil.readVehicleRegistrationNumber());
-
-        Thread.sleep(1000);
-
         parkingService.processIncomingVehicle();
-
-        //---Modifying Database incoming Ticket---
-        //--First ticket to be modified (need top modify this one because if not, it would be anterior to last ticket afterwards)
-
-        //--Second Ticket
 
         //-------------WHEN----------------
         parkingService.processExitingVehicleSpecialDate(LocalDateTime.now().plusMinutes(45));

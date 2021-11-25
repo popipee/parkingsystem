@@ -29,6 +29,10 @@ public class ParkingService {
     }
 
     public void processIncomingVehicle() {
+        processIncomingVehicleSpecialInTimeDate(LocalDateTime.now());
+    }
+
+    public void processIncomingVehicleSpecialInTimeDate(LocalDateTime inTime) {
         try{
             ParkingSpot parkingSpot = getNextParkingNumberIfAvailable();
             if(parkingSpot !=null && parkingSpot.getId() > 0){
@@ -36,10 +40,9 @@ public class ParkingService {
                 parkingSpot.setAvailable(false);
                 parkingSpotDAO.updateParking(parkingSpot);//allot this parking space and mark it's availability as false
 
-                LocalDateTime inTime = LocalDateTime.now();
                 inTime = inTime.truncatedTo(ChronoUnit.SECONDS);
-
                 Ticket ticket = new Ticket();
+//                Ticket ticket = new Ticket();
                 //ID, PARKING_NUMBER, VEHICLE_REG_NUMBER, PRICE, IN_TIME, OUT_TIME, ALREADY_EXIST
 //                ticket.setId(ticketID);
                 ticket.setParkingSpot(parkingSpot);
@@ -47,8 +50,18 @@ public class ParkingService {
                 ticket.setPrice(0);
                 ticket.setInTime(inTime);
                 ticket.setOutTime(null);
-                //TODO : add something about recurring user here
                 ticketDAO.saveTicket(ticket);
+
+                //---- For Recurring users ----
+                Ticket ticketExist = new Ticket();
+                ticketExist = ticketDAO.getTicket(vehicleRegNumber);
+                if(ticketExist!= null && ticketExist.getAlreadyExists()) {
+                    System.out.println("----------------------------------------------------------------------------------------");
+                    System.out.println("Welcome back! As a recurring user of our parking lot, you'll benefit from a 5% discount.");
+                    System.out.println("----------------------------------------------------------------------------------------");
+                }
+                //-----------------------------
+
                 System.out.println("Generated Ticket and saved in DB");
                 System.out.println("Please park your vehicle in spot number:"+parkingSpot.getId());
                 System.out.println("Recorded in-time for vehicle number:"+vehicleRegNumber+" is:"+inTime);
@@ -100,31 +113,6 @@ public class ParkingService {
             }
         }
     }
-
-//    public void processExitingVehicle() {
-//        try{
-//            String vehicleRegNumber = getVehicleRegNumber();
-//            Ticket ticket = ticketDAO.getTicket(vehicleRegNumber);
-//            LocalDateTime outTime = LocalDateTime.now();
-//            outTime = outTime.truncatedTo(ChronoUnit.SECONDS);
-//            ticket.setOutTime(outTime);
-//
-//            fareCalculatorService.calculateFare(ticket);
-//
-//            //update parking spot after having updated ticket
-//            if(ticketDAO.updateTicket(ticket)) {
-//                ParkingSpot parkingSpot = ticket.getParkingSpot();
-//                parkingSpot.setAvailable(true);
-//                parkingSpotDAO.updateParking(parkingSpot);
-//                System.out.println("Please pay the parking fare:" + ticket.getPrice());
-//                System.out.println("Recorded out-time for vehicle number:" + ticket.getVehicleRegNumber() + " is:" + outTime);
-//            }else{
-//                System.out.println("Unable to update ticket information. Error occurred");
-//            }
-//        }catch(Exception e){
-//            logger.error("Unable to process exiting vehicle",e);
-//        }
-//    }
 
     public void processExitingVehicle() {
         processExitingVehicleSpecialDate(LocalDateTime.now());
