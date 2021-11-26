@@ -81,16 +81,4 @@ public class ParkingServiceTest {
         verify(ticketDAO, Mockito.times(1)).updateTicket(any(Ticket.class));
     }
 
-    @DisplayName("Check if a recurring customer benefits from a 5% discount")
-    @Test
-    public void OutgoingVehicle_ForARecurringUser_ShouldBenefitFromA5PercentDiscount(){
-        //GIVEN
-
-
-        //WHEN
-
-        //THEN
-
-    }
-
 }

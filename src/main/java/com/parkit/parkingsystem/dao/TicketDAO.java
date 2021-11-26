@@ -1,7 +1,7 @@
 package com.parkit.parkingsystem.dao;
 
 import com.parkit.parkingsystem.config.DataBaseConfig;
-import com.parkit.parkingsystem.constants.DBConstants;
+import com.parkit.parkingsystem.constants.DataBaseConstants;
 import com.parkit.parkingsystem.constants.ParkingType;
 import com.parkit.parkingsystem.model.ParkingSpot;
 import com.parkit.parkingsystem.model.Ticket;
@@ -9,7 +9,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.sql.*;
-import java.time.LocalDateTime;
 
 public class TicketDAO {
 
@@ -21,7 +20,7 @@ public class TicketDAO {
         Connection con = null;
         try {
             con = dataBaseConfig.getConnection();
-            PreparedStatement ps = con.prepareStatement(DBConstants.SAVE_TICKET);
+            PreparedStatement ps = con.prepareStatement(DataBaseConstants.SAVE_TICKET);
             //PARKING_NUMBER, VEHICLE_REG_NUMBER, PRICE, IN_TIME, OUT_TIME)
             ps.setInt(1,ticket.getParkingSpot().getId());
             ps.setString(2, ticket.getVehicleRegNumber());
@@ -44,7 +43,7 @@ public class TicketDAO {
         try {
             con = dataBaseConfig.getConnection();
             //Prepared Statement ordered parameters: VEHICULE_REG_NUMBER
-            PreparedStatement ps = con.prepareStatement(DBConstants.GET_TICKETS,ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_READ_ONLY);
+            PreparedStatement ps = con.prepareStatement(DataBaseConstants.GET_TICKETS,ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_READ_ONLY);
             ps.setString(1,vehicleRegNumber);
             //Result Statement ordered parameters : PARKING_NUMBER, ID, PRICE, IN_TIME, OUT_TIME, TYPE
             ResultSet rs = ps.executeQuery();
@@ -82,7 +81,7 @@ public class TicketDAO {
         Connection con = null;
         try {
             con = dataBaseConfig.getConnection();
-            PreparedStatement ps = con.prepareStatement(DBConstants.UPDATE_TICKET);
+            PreparedStatement ps = con.prepareStatement(DataBaseConstants.UPDATE_TICKET);
             ps.setDouble(1, ticket.getPrice());
             ps.setTimestamp(2, Timestamp.valueOf(ticket.getOutTime()));
             ps.setInt(3,ticket.getId());
@@ -100,7 +99,7 @@ public class TicketDAO {
         Connection con = null;
         try {
             con = dataBaseConfig.getConnection();
-            PreparedStatement ps = con.prepareStatement(DBConstants.UPDATE_TICKET_INTIME);
+            PreparedStatement ps = con.prepareStatement(DataBaseConstants.UPDATE_TICKET_INTIME);
             ps.setTimestamp(1, Timestamp.valueOf(ticket.getInTime()));
             ps.setInt(2,ticket.getId());
             ps.execute();
@@ -117,7 +116,7 @@ public class TicketDAO {
         Connection con = null;
         try {
             con = dataBaseConfig.getConnection();
-            PreparedStatement ps = con.prepareStatement(DBConstants.UPDATE_TICKET_OUTTIME);
+            PreparedStatement ps = con.prepareStatement(DataBaseConstants.UPDATE_TICKET_OUTTIME);
             ps.setTimestamp(1, Timestamp.valueOf(ticket.getOutTime()));
             ps.setInt(2,ticket.getId());
             ps.execute();
