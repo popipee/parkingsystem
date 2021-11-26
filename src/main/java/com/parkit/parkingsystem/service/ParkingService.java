@@ -1,8 +1,8 @@
 package com.parkit.parkingsystem.service;
 
 import com.parkit.parkingsystem.constants.ParkingType;
-import com.parkit.parkingsystem.dao.ParkingSpotDAO;
-import com.parkit.parkingsystem.dao.TicketDAO;
+import com.parkit.parkingsystem.dao.ParkingSpotDao;
+import com.parkit.parkingsystem.dao.TicketDao;
 import com.parkit.parkingsystem.model.ParkingSpot;
 import com.parkit.parkingsystem.model.Ticket;
 import com.parkit.parkingsystem.util.InputReaderUtil;
@@ -19,10 +19,10 @@ public class ParkingService {
     private static FareCalculatorService fareCalculatorService = new FareCalculatorService();
 
     private InputReaderUtil inputReaderUtil;
-    private ParkingSpotDAO parkingSpotDAO;
-    private TicketDAO ticketDAO;
+    private ParkingSpotDao parkingSpotDAO;
+    private TicketDao ticketDAO;
 
-    public ParkingService(InputReaderUtil inputReaderUtil, ParkingSpotDAO parkingSpotDAO, TicketDAO ticketDAO){
+    public ParkingService(InputReaderUtil inputReaderUtil, ParkingSpotDao parkingSpotDAO, TicketDao ticketDAO){
         this.inputReaderUtil = inputReaderUtil;
         this.parkingSpotDAO = parkingSpotDAO;
         this.ticketDAO = ticketDAO;
