@@ -1,10 +1,14 @@
 package com.parkit.parkingsystem.config;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Properties;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -26,10 +30,27 @@ public class DataBaseConfig {
    * @throws SQLException if a database access error occurs or the url is null
    */
   public Connection getConnection() throws ClassNotFoundException, SQLException {
-    LOGGER.info("Create DB connection");
-    Class.forName("com.mysql.cj.jdbc.Driver");
-    return DriverManager.getConnection(
-        "jdbc:mysql://localhost:3306/prod", "root", "rootroot");
+    Properties properties = new Properties();
+    String user = null, pass = null, url = null, driver = null;
+    String absoluteLocationOfCredentials = "resources/credentials.properties";
+    LOGGER.info("Trying to retrieve credentials from file located in : \n"
+        + System.getProperty("user.dir") + "/" + absoluteLocationOfCredentials);
+    try {
+      properties.load(new FileInputStream(absoluteLocationOfCredentials));
+      user = properties.getProperty("username");
+      pass = properties.getProperty("password");
+      url = properties.getProperty("url");
+      driver = properties.getProperty("driver");
+
+      LOGGER.info("Create DB connection");
+      Class.forName(driver);
+
+    } catch (Exception e) {
+      e.printStackTrace();
+      LOGGER.error("Could not find credentials file to connect to database.");
+    } finally {
+      return DriverManager.getConnection(url, user, pass);
+    }
   }
 
   /**
