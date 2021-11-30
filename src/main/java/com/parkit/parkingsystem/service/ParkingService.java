@@ -68,7 +68,7 @@ public class ParkingService {
         ticket.setOutTime(null);
         ticketDao.saveTicket(ticket);
 
-        //---- For Recurring users ----
+        //---- For Recurring users ----------------------------------------------------------------
         Ticket ticketExist = new Ticket();
         ticketExist = ticketDao.getTicket(vehicleRegNumber);
         if (ticketExist != null && ticketExist.getAlreadyExists()) {
@@ -82,7 +82,7 @@ public class ParkingService {
               "-----------------------------------------------------"
                   + "-----------------------------------");
         }
-        //-----------------------------
+        //-----------------------------------------------------------------------------------------
 
         System.out.println("Generated Ticket and saved in DB");
         System.out.println("Please park your vehicle in spot number:" + parkingSpot.getId());

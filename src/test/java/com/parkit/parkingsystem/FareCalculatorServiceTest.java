@@ -180,7 +180,8 @@ public class FareCalculatorServiceTest {
 
 
     //THEN
-    assertThat(ticket.getPrice()).isEqualTo((1.0 * Fare.CAR_RATE_PER_HOUR) * (0.95));
+    assertThat(ticket.getPrice()).isEqualTo((Fare.CAR_RATE_PER_HOUR) * (0.95));
 
   }
+
 }
