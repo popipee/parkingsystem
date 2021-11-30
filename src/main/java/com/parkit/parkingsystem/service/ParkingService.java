@@ -69,7 +69,7 @@ public class ParkingService {
         ticketDao.saveTicket(ticket);
 
         //---- For Recurring users ----------------------------------------------------------------
-        Ticket ticketExist = new Ticket();
+        Ticket ticketExist;
         ticketExist = ticketDao.getTicket(vehicleRegNumber);
         if (ticketExist != null && ticketExist.getAlreadyExists()) {
           System.out.println(

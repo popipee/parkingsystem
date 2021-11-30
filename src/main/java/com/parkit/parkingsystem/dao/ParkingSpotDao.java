@@ -71,7 +71,6 @@ public class ParkingSpotDao {
       ResultSet rs = ps.executeQuery();
       if (rs.next()) {
         result = rs.getInt(1);
-        ;
       }
       dataBaseConfig.closeResultSet(rs);
       dataBaseConfig.closePreparedStatement(ps);
