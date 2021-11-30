@@ -20,11 +20,10 @@ import java.time.LocalDateTime;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ExtendWith(MockitoExtension.class)
 public class ParkingDataBaseIT {
 
-  private static DataBaseTestConfig dataBaseTestConfig = new DataBaseTestConfig();
+  private static final DataBaseTestConfig DATA_BASE_TEST_CONFIG = new DataBaseTestConfig();
   private static ParkingSpotDao parkingSpotDAO;
   private static TicketDao ticketDAO;
   private static DataBasePrepareService dataBasePrepareService;
@@ -32,35 +31,34 @@ public class ParkingDataBaseIT {
   private static InputReaderUtil inputReaderUtil;
   private Ticket ticket;
   private ParkingSpot parkingSpot;
+  private ParkingService parkingService;
 
   @BeforeAll
-  private static void setUp() throws Exception {
+  private static void setUp() {
     parkingSpotDAO = new ParkingSpotDao();
-    parkingSpotDAO.dataBaseConfig = dataBaseTestConfig;
+    parkingSpotDAO.dataBaseConfig = DATA_BASE_TEST_CONFIG;
     ticketDAO = new TicketDao();
-    ticketDAO.dataBaseConfig = dataBaseTestConfig;
+    ticketDAO.dataBaseConfig = DATA_BASE_TEST_CONFIG;
     dataBasePrepareService = new DataBasePrepareService();
   }
 
   @BeforeEach
   private void setUpPerTest() throws Exception {
     dataBasePrepareService.clearDataBaseEntries(); //clear database entries to prepare for future sql request
-
-    Ticket ticket = new Ticket();
-    ParkingSpot parkingSpot = new ParkingSpot();
+    parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+    //Mocking a vehicle registration number to ABCDEF whatever it is a car or a bike
+    when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
+    ticket = new Ticket();
+    parkingSpot = new ParkingSpot();
   }
 
 
   @DisplayName("Test inTime is populated properly in database for a car an parking slot is not available")
   @Test
-  @Order(1)
   public void testParkingACar() throws Exception {
     //GIVEN
-    //Mocking a car in row 1 and Reg ABCDEF
-    when(inputReaderUtil.readSelection()).thenReturn(1); //mock reader selection, so it always chooses type 1 (i.e. CAR)
-    when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF"); //mock reader selection, so it always returns 'ABCDEF' when reading registration number
-
-    ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+    //mock reader selection, so it always chooses type 1 (i.e. CAR)
+    when(inputReaderUtil.readSelection()).thenReturn(1);
 
     //WHEN
     parkingService.processIncomingVehicle();
@@ -75,15 +73,11 @@ public class ParkingDataBaseIT {
 
   @DisplayName("Test outTime and price are properly populated in database and parking slot is free")
   @Test
-  @Order(2)
   public void testParkingLotExit() throws Exception {
     //GIVEN
-    //Mocking a car in row 1 and Reg ABCDEF
     when(inputReaderUtil.readSelection()).thenReturn(1); //mock reader selection, so it always chooses type 1 (i.e. CAR)
-    when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF"); //mock reader selection, so it always returns 'ABCDEF' when reading registration number
-
     testParkingACar();
-    ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+
 
     //WHEN
     parkingService.processExitingVehicle();
@@ -100,16 +94,11 @@ public class ParkingDataBaseIT {
   @Disabled
   @DisplayName("Testing 5% discount for a recurring car. REAL so it lasts 45min")
   @Test
-  @Order(3)
   public void testReal5PercentDiscountEntering() throws Exception {
-    //We Spy on LocalDateTime time to manipulate time int database writing
-
     //-------------GIVEN----------------
-    ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
     //---INCOMING---
     //-CAR1
     //Mocking a car registered ABCDEF
-    Mockito.doReturn("ABCDEF").when(inputReaderUtil).readVehicleRegistrationNumber(); //mock reader selection, so it always returns 'ABCDEF' when reading registration number
     Mockito.doReturn(1).when(inputReaderUtil).readSelection(); //mock reader selection, so it always chooses type 1 (i.e. CAR)
     parkingService.processIncomingVehicle();
     Thread.sleep(1000);
@@ -132,22 +121,12 @@ public class ParkingDataBaseIT {
 
   @DisplayName("Testing 5% discount for a recurring car.")
   @Test
-  @Order(4)
   public void testSimulated5PercentDiscountEntering() throws Exception {
-    //We Spy on LocalDateTime time to manipulate time int database writing
-
     //-------------GIVEN----------------
-    ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
-    Ticket ticketNumberTwo = new Ticket();
+    Ticket ticketNumberTwo;
     //---INCOMING---
-    //-CAR1
-    //Mocking a car registered ABCDEF
-    Mockito.doReturn("ABCDEF").when(inputReaderUtil).readVehicleRegistrationNumber(); //mock reader selection, so it always returns 'ABCDEF' when reading registration number
-    Mockito.doReturn(1).when(inputReaderUtil).readSelection(); //mock reader selection, so it always chooses type 1 (i.e. CAR)
+    when(inputReaderUtil.readSelection()).thenReturn(1);
     parkingService.processIncomingVehicleSpecialInTimeDate(LocalDateTime.now().minusMinutes(45));
-//        ticket = ticketDAO.getTicket(inputReaderUtil.readVehicleRegistrationNumber());
-//        ticket.setInTime(ticket.getInTime().minusMinutes(45));
-//        ticketDAO.updateTicketInTime(ticket);
 
     //---EXITING/ENTERING---
     parkingService.processExitingVehicle();

@@ -9,10 +9,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * Class that create a connection to the a MySQL database
+ * Class that create a connection to a MySQL database
  * and deals with closing statement and result sets.
  */
 public class DataBaseConfig {
+  /**
+   * final object used to log information during process.
+   */
   private static final Logger LOGGER = LogManager.getLogger("DataBaseConfig");
 
   /**
