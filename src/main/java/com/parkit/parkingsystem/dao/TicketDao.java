@@ -9,6 +9,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -25,6 +27,7 @@ public class TicketDao {
    * @param ticket is the ticket object to be saved. Could be found in the model package.
    * @return a boolean which is true if the operation went well.
    */
+  @SuppressFBWarnings("DLS_DEAD_LOCAL_STORE")
   public boolean saveTicket(Ticket ticket) {
     Connection con = null;
     PreparedStatement ps = null;
@@ -60,17 +63,18 @@ public class TicketDao {
   public Ticket getTicket(String vehicleRegNumber) {
     Connection con = null;
     Ticket ticket = null;
-
+    PreparedStatement ps = null;
+    ResultSet rs = null;
     try {
       con = dataBaseConfig.getConnection();
       //Prepared Statement ordered parameters: VEHICULE_REG_NUMBER
-      PreparedStatement ps = con.prepareStatement(
+      ps = con.prepareStatement(
           DataBaseConstants.GET_TICKETS,
           ResultSet.TYPE_SCROLL_INSENSITIVE,
           ResultSet.CONCUR_READ_ONLY);
       ps.setString(1, vehicleRegNumber);
       // Result Statement ordered parameters : PARKING_NUMBER, ID, PRICE, IN_TIME, OUT_TIME, TYPE
-      ResultSet rs = ps.executeQuery();
+      rs = ps.executeQuery();
 
       // rs.next is used to move the cursor of the result set to the first row.
       // Here the GET_TICKETS will giv us the last ticket so it is okay to read only first row.
@@ -98,11 +102,11 @@ public class TicketDao {
           ticket.setAlreadyExists(false);
         }
       }
-      dataBaseConfig.closeResultSet(rs);
-      dataBaseConfig.closePreparedStatement(ps);
     } catch (Exception ex) {
       logger.error("Error fetching next available slot", ex);
     } finally {
+      dataBaseConfig.closeResultSet(rs);
+      dataBaseConfig.closePreparedStatement(ps);
       dataBaseConfig.closeConnection(con);
       return ticket;
     }

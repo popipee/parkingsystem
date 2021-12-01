@@ -9,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Properties;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -49,7 +50,7 @@ public class DataBaseConfig {
       e.printStackTrace();
       LOGGER.error("Could not find credentials file to connect to database.");
     } finally {
-      fileInputStream.close();
+      closeFileInputStream(fileInputStream);
       return DriverManager.getConnection(url, user, pass);
     }
   }
@@ -98,6 +99,17 @@ public class DataBaseConfig {
         LOGGER.info("Closing Result Set");
       } catch (SQLException e) {
         LOGGER.error("Error while closing result set", e);
+      }
+    }
+  }
+
+  public void closeFileInputStream(FileInputStream fileInputStream) {
+    if (fileInputStream != null) {
+      try {
+        fileInputStream.close();
+        LOGGER.info("Closing File Input Stream");
+      } catch (IOException e) {
+        LOGGER.error("Error while closing FileInputStream", e);
       }
     }
   }
