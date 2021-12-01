@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Ticket.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">parking-system</a> &gt; <a href="index.source.html" class="el_package">com.parkit.parkingsystem.model</a> &gt; <span class="el_source">Ticket.java</span></div><h1>Ticket.java</h1><pre class="source lang-java linenums">package com.parkit.parkingsystem.model;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
+import java.time.LocalDateTime;
+
+/**
+ * This class is a model used to represent a Ticket in the app.
+ */
+<span class="fc" id="L10">public class Ticket {</span>
+  private int id;
+  private ParkingSpot parkingSpot;
+  private String vehicleRegNumber;
+  private double price;
+  private LocalDateTime inTime;
+  private LocalDateTime outTime;
+  private boolean alreadyExists;
+
+  public int getId() {
+<span class="nc" id="L20">    return id;</span>
+  }
+
+  public void setId(int id) {
+<span class="nc" id="L24">    this.id = id;</span>
+<span class="nc" id="L25">  }</span>
+
+  @SuppressFBWarnings(&quot;EI_EXPOSE_REP&quot;)
+  public ParkingSpot getParkingSpot() {
+<span class="fc" id="L29">    return parkingSpot;</span>
+  }
+
+  @SuppressFBWarnings(&quot;EI_EXPOSE_REP2&quot;)
+  public void setParkingSpot(ParkingSpot parkingSpot) {
+<span class="fc" id="L34">    this.parkingSpot = parkingSpot;</span>
+<span class="fc" id="L35">  }</span>
+
+  public String getVehicleRegNumber() {
+<span class="fc" id="L38">    return vehicleRegNumber;</span>
+  }
+
+  public void setVehicleRegNumber(String vehicleRegNumber) {
+<span class="fc" id="L42">    this.vehicleRegNumber = vehicleRegNumber;</span>
+<span class="fc" id="L43">  }</span>
+
+  public double getPrice() {
+<span class="fc" id="L46">    return price;</span>
+  }
+
+  public void setPrice(double price) {
+<span class="fc" id="L50">    this.price = price;</span>
+<span class="fc" id="L51">  }</span>
+
+  public LocalDateTime getInTime() {
+<span class="fc" id="L54">    return inTime;</span>
+  }
+
+  public void setInTime(LocalDateTime inTime) {
+<span class="fc" id="L58">    this.inTime = inTime;</span>
+<span class="fc" id="L59">  }</span>
+
+  public LocalDateTime getOutTime() {
+<span class="fc" id="L62">    return outTime;</span>
+  }
+
+  public void setOutTime(LocalDateTime outTime) {
+<span class="fc" id="L66">    this.outTime = outTime;</span>
+<span class="fc" id="L67">  }</span>
+
+  public boolean getAlreadyExists() {
+<span class="fc" id="L70">    return alreadyExists;</span>
+  }
+
+  public void setAlreadyExists(boolean exists) {
+<span class="fc" id="L74">    this.alreadyExists = exists;</span>
+<span class="fc" id="L75">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
