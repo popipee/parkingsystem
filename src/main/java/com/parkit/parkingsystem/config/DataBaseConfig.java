@@ -1,6 +1,7 @@
 package com.parkit.parkingsystem.config;
 
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -28,26 +29,27 @@ public class DataBaseConfig {
    * @throws ClassNotFoundException if the class cannot be located
    * @throws SQLException if a database access error occurs or the url is null
    */
-  public Connection getConnection() throws ClassNotFoundException, SQLException {
+  public Connection getConnection() throws ClassNotFoundException, SQLException, IOException {
     Properties properties = new Properties();
     String user = null, pass = null, url = null, driver = null;
     String absoluteLocationOfCredentials = "resources/credentials.properties";
     LOGGER.info("Trying to retrieve credentials from file located in : \n"
         + System.getProperty("user.dir") + "/" + absoluteLocationOfCredentials);
+    FileInputStream fileInputStream = null;
     try {
-      properties.load(new FileInputStream(absoluteLocationOfCredentials));
+      fileInputStream = new FileInputStream(absoluteLocationOfCredentials);
+      properties.load(fileInputStream);
       user = properties.getProperty("username");
       pass = properties.getProperty("password");
       url = properties.getProperty("url");
       driver = properties.getProperty("driver");
-
       LOGGER.info("Create DB connection");
       Class.forName(driver);
-
     } catch (Exception e) {
       e.printStackTrace();
       LOGGER.error("Could not find credentials file to connect to database.");
     } finally {
+      fileInputStream.close();
       return DriverManager.getConnection(url, user, pass);
     }
   }

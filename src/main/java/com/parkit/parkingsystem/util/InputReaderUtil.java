@@ -10,7 +10,7 @@ import org.apache.logging.log4j.Logger;
 public class InputReaderUtil {
 
   private static final Logger logger = LogManager.getLogger("InputReaderUtil");
-  private static Scanner scan = new Scanner(System.in);
+  private static final Scanner SCANNER = new Scanner(System.in,"utf-8");
 
   /**
    * This method read the user selection regarding a list of choice thrown by the shell.
@@ -19,7 +19,7 @@ public class InputReaderUtil {
    */
   public int readSelection() {
     try {
-      int input = Integer.parseInt(scan.nextLine());
+      int input = Integer.parseInt(SCANNER.nextLine());
       return input;
     } catch (Exception e) {
       logger.error("Error while reading user input from Shell", e);
@@ -36,7 +36,7 @@ public class InputReaderUtil {
    */
   public String readVehicleRegistrationNumber() throws Exception {
     try {
-      String vehicleRegNumber = scan.nextLine();
+      String vehicleRegNumber = SCANNER.nextLine();
       if (vehicleRegNumber == null || vehicleRegNumber.trim().length() == 0) {
         throw new IllegalArgumentException("Invalid input provided");
       }
