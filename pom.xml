@@ -14,7 +14,10 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <junit.jupiter.version>5.8.1</junit.jupiter.version>
         <apache.log4j.version>2.14.1</apache.log4j.version>
+        <spotbugs.plugins.version>4.5.0</spotbugs.plugins.version>
         <spotbugs.maven.plugin.version>4.5.0.0</spotbugs.maven.plugin.version>
+        <maven.site.plugin.version>3.9.1</maven.site.plugin.version>
+        <mvn.project.info.reports.version>3.1.2</mvn.project.info.reports.version>
     </properties>
 
     <dependencies>
@@ -74,13 +77,13 @@
         <dependency>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-project-info-reports-plugin</artifactId>
-            <version>3.1.2</version>
+            <version>${mvn.project.info.reports.version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-site-plugin -->
         <dependency>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-site-plugin</artifactId>
-            <version>3.9.1</version>
+            <version>${maven.site.plugin.version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/com.github.spotbugs/spotbugs-maven-plugin -->
         <dependency>
@@ -88,12 +91,25 @@
             <artifactId>spotbugs-maven-plugin</artifactId>
             <version>${spotbugs.maven.plugin.version}</version>
         </dependency>
-
+        <!-- https://mvnrepository.com/artifact/com.github.spotbugs/spotbugs-annotations -->
+        <dependency>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs-annotations</artifactId>
+            <version>${spotbugs.plugins.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.github.spotbugs/spotbugs -->
+        <dependency>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs</artifactId>
+            <version>${spotbugs.plugins.version}</version>
+            <type>pom</type>
+        </dependency>
 
     </dependencies>
 
     <build>
         <plugins>
+            <!--maven-assembly-plugin-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -118,6 +134,7 @@
                     </execution>
                 </executions>
             </plugin>
+            <!--maven-surefire-plugin-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -127,6 +144,7 @@
                     <argLine>${surefire.jacoco.args}</argLine>
                 </configuration>
             </plugin>
+            <!--maven-failsafe-plugin-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
@@ -144,6 +162,7 @@
                     </execution>
                 </executions>
             </plugin>
+            <!--jacoco-maven-plugin-->
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
@@ -224,12 +243,24 @@
 
                 </executions>
             </plugin>
-
-
+            <!--maven-site-plugin-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>${maven.site.plugin.version}</version>
+            </plugin>
+            <!--maven-project-info-reports-plugin-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>${mvn.project.info.reports.version}</version>
+            </plugin>
         </plugins>
     </build>
+
     <reporting>
         <plugins>
+            <!--spotbugs-maven-plugin-->
             <plugin>
                 <groupId>com.github.spotbugs</groupId>
                 <artifactId>spotbugs-maven-plugin</artifactId>
