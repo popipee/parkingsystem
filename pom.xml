@@ -12,135 +12,260 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <junit.jupiter.version>5.8.1</junit.jupiter.version>
+        <apache.log4j.version>2.14.1</apache.log4j.version>
+        <spotbugs.plugins.version>4.5.0</spotbugs.plugins.version>
+        <spotbugs.maven.plugin.version>4.5.0.0</spotbugs.maven.plugin.version>
+        <maven.site.plugin.version>3.9.1</maven.site.plugin.version>
+        <mvn.project.info.reports.version>3.1.2</mvn.project.info.reports.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
-            <version>2.12.1</version>
+            <version>${apache.log4j.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
-            <version>2.12.1</version>
+            <version>${apache.log4j.version}</version>
         </dependency>
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.17</version>
+            <version>8.0.27</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>5.3.2</version>
+            <version>${junit.jupiter.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <version>5.3.2</version>
+            <version>${junit.jupiter.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
-            <version>2.23.4</version>
+            <version>4.1.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.jacoco</groupId>
             <artifactId>jacoco-maven-plugin</artifactId>
-            <version>0.8.5</version>
+            <version>0.8.7</version>
             <type>maven-plugin</type>
         </dependency>
         <dependency>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-assembly-plugin</artifactId>
-            <version>3.0.0</version>
+            <version>3.3.0</version>
+            <scope>compile</scope>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.assertj/assertj-core -->
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>3.21.0</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-project-info-reports-plugin -->
+        <dependency>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-project-info-reports-plugin</artifactId>
+            <version>${mvn.project.info.reports.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-site-plugin -->
+        <dependency>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-site-plugin</artifactId>
+            <version>${maven.site.plugin.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.github.spotbugs/spotbugs-maven-plugin -->
+        <dependency>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs-maven-plugin</artifactId>
+            <version>${spotbugs.maven.plugin.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.github.spotbugs/spotbugs-annotations -->
+        <dependency>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs-annotations</artifactId>
+            <version>${spotbugs.plugins.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.github.spotbugs/spotbugs -->
+        <dependency>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs</artifactId>
+            <version>${spotbugs.plugins.version}</version>
+            <type>pom</type>
+        </dependency>
+
     </dependencies>
 
     <build>
         <plugins>
+            <!--maven-assembly-plugin-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <archive>
+                        <manifest>
+                            <mainClass>
+                                com.parkit.parkingsystem.App
+                            </mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
                 <executions>
                     <execution>
                         <phase>package</phase>
                         <goals>
                             <goal>single</goal>
                         </goals>
-                        <configuration>
-                            <archive>
-                                <manifest>
-                                    <mainClass>
-                                        com.parkit.parkingsystem.App
-                                    </mainClass>
-                                </manifest>
-                            </archive>
-                            <descriptorRefs>
-                                <descriptorRef>executable-jar-with-dependencies</descriptorRef>
-                            </descriptorRefs>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
+            <!--maven-surefire-plugin-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.21.0</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.junit.platform</groupId>
-                        <artifactId>junit-platform-surefire-provider</artifactId>
-                        <version>1.2.0</version>
-                    </dependency>
-                </dependencies>
+                <version>2.22.2</version>
                 <configuration>
-                    <excludes>
-                        <exclude>**/*IT.java</exclude>
-                    </excludes>
+                    <!--suppress UnresolvedMavenProperty -->
+                    <argLine>${surefire.jacoco.args}</argLine>
+                </configuration>
+            </plugin>
+            <!--maven-failsafe-plugin-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>2.22.2</version>
+                <configuration>
+                    <!--suppress UnresolvedMavenProperty -->
+                    <argLine>${failsafe.jacoco.args}</argLine>
                 </configuration>
                 <executions>
                     <execution>
-                        <id>integration-test</id>
                         <goals>
-                            <goal>test</goal>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
                         </goals>
-                        <phase>integration-test</phase>
-                        <configuration>
-                            <excludes>
-                                <exclude>none</exclude>
-                            </excludes>
-                            <includes>
-                                <include>**/*IT.java</include>
-                            </includes>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
+            <!--jacoco-maven-plugin-->
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.5</version>
+                <version>0.8.7</version>
                 <executions>
                     <execution>
+                        <id>before-unit-test-execution</id>
                         <goals>
                             <goal>prepare-agent</goal>
                         </goals>
+                        <configuration>
+                            <destFile>${project.build.directory}/jacoco-output/jacoco-unit-tests.exec</destFile>
+                            <propertyName>surefire.jacoco.args</propertyName>
+                        </configuration>
                     </execution>
                     <execution>
-                        <id>jacoco-report</id>
+                        <id>after-unit-test-execution</id>
                         <phase>test</phase>
                         <goals>
                             <goal>report</goal>
                         </goals>
+                        <configuration>
+                            <dataFile>${project.build.directory}/jacoco-output/jacoco-unit-tests.exec</dataFile>
+                            <outputDirectory>${project.reporting.outputDirectory}/jacoco-unit-test-coverage-report</outputDirectory>
+                        </configuration>
                     </execution>
+                    <execution>
+                        <id>before-integration-test-execution</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                        <configuration>
+                            <destFile>${project.build.directory}/jacoco-output/jacoco-integration-tests.exec</destFile>
+                            <propertyName>failsafe.jacoco.args</propertyName>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>after-integration-test-execution</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                        <configuration>
+                            <dataFile>${project.build.directory}/jacoco-output/jacoco-integration-tests.exec</dataFile>
+                            <outputDirectory>${project.reporting.outputDirectory}/jacoco-integration-test-coverage-report</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>merge-unit-and-integration</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>merge</goal>
+                        </goals>
+                        <configuration>
+                            <fileSets>
+                                <fileSet>
+                                    <directory>${project.build.directory}/jacoco-output/</directory>
+                                    <includes>
+                                        <include>*.exec</include>
+                                    </includes>
+                                </fileSet>
+                            </fileSets>
+                            <destFile>${project.build.directory}/jacoco-output/merged.exec</destFile>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>create-merged-report</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                        <configuration>
+                            <dataFile>${project.build.directory}/jacoco-output/merged.exec</dataFile>
+                            <outputDirectory>${project.reporting.outputDirectory}/jacoco-merged-test-coverage-report</outputDirectory>
+                        </configuration>
+                    </execution>
+
                 </executions>
+            </plugin>
+            <!--maven-site-plugin-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>${maven.site.plugin.version}</version>
+            </plugin>
+            <!--maven-project-info-reports-plugin-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>${mvn.project.info.reports.version}</version>
             </plugin>
         </plugins>
     </build>
 
+    <reporting>
+        <plugins>
+            <!--spotbugs-maven-plugin-->
+            <plugin>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+                <version>${spotbugs.maven.plugin.version}</version>
+            </plugin>
+        </plugins>
+    </reporting>
 </project>

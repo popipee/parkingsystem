@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ParkingSpot.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">parking-system</a> &gt; <a href="index.source.html" class="el_package">com.parkit.parkingsystem.model</a> &gt; <span class="el_source">ParkingSpot.java</span></div><h1>ParkingSpot.java</h1><pre class="source lang-java linenums">package com.parkit.parkingsystem.model;
+
+import com.parkit.parkingsystem.constants.ParkingType;
+
+/**
+ * This class is a model used to represent a Parking Spot in the app.
+ */
+public class ParkingSpot {
+  private int number;
+  private ParkingType parkingType;
+  private boolean isAvailable;
+
+  /**
+   * A null constructor.
+   */
+<span class="fc" id="L16">  public ParkingSpot() {</span>
+<span class="fc" id="L17">  }</span>
+
+  /**
+   * This is the constructor of a specified parking Spot.
+   *
+   * @param number      represent the id of the parking spot (usually the parking spot number)
+   * @param parkingType is the type for which vehicle the parking spot is reserved
+   * @param isAvailable is the boolean availability of the parking spot.
+   */
+<span class="fc" id="L26">  public ParkingSpot(int number, ParkingType parkingType, boolean isAvailable) {</span>
+<span class="fc" id="L27">    this.number = number;</span>
+<span class="fc" id="L28">    this.parkingType = parkingType;</span>
+<span class="fc" id="L29">    this.isAvailable = isAvailable;</span>
+<span class="fc" id="L30">  }</span>
+
+  public int getId() {
+<span class="fc" id="L33">    return number;</span>
+  }
+
+  public void setId(int number) {
+<span class="fc" id="L37">    this.number = number;</span>
+<span class="fc" id="L38">  }</span>
+
+  public ParkingType getParkingType() {
+<span class="fc" id="L41">    return parkingType;</span>
+  }
+
+  public void setParkingType(ParkingType parkingType) {
+<span class="fc" id="L45">    this.parkingType = parkingType;</span>
+<span class="fc" id="L46">  }</span>
+
+  public boolean isAvailable() {
+<span class="fc" id="L49">    return isAvailable;</span>
+  }
+
+  public void setAvailable(boolean available) {
+<span class="fc" id="L53">    isAvailable = available;</span>
+<span class="fc" id="L54">  }</span>
+
+  @Override
+  public boolean equals(Object o) {
+<span class="nc bnc" id="L58" title="All 2 branches missed.">    if (this == o) {</span>
+<span class="nc" id="L59">      return true;</span>
+    }
+
+<span class="nc bnc" id="L62" title="All 4 branches missed.">    if (o == null || getClass() != o.getClass()) {</span>
+<span class="nc" id="L63">      return false;</span>
+    }
+<span class="nc" id="L65">    ParkingSpot that = (ParkingSpot) o;</span>
+<span class="nc bnc" id="L66" title="All 2 branches missed.">    return number == that.number;</span>
+  }
+
+  @Override
+  public int hashCode() {
+<span class="nc" id="L71">    return number;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

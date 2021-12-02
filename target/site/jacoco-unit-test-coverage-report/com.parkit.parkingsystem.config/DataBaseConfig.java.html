@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DataBaseConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">parking-system</a> &gt; <a href="index.source.html" class="el_package">com.parkit.parkingsystem.config</a> &gt; <span class="el_source">DataBaseConfig.java</span></div><h1>DataBaseConfig.java</h1><pre class="source lang-java linenums">package com.parkit.parkingsystem.config;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Properties;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+/**
+ * Class that create a connection to a MySQL database
+ * and deals with closing statement and result sets.
+ */
+<span class="nc" id="L20">public class DataBaseConfig {</span>
+  /**
+   * final object used to log information during process.
+   */
+<span class="nc" id="L24">  private static final Logger LOGGER = LogManager.getLogger(&quot;DataBaseConfig&quot;);</span>
+
+  /**
+   * Open a connection to the database localhost:3306/prod as root user.
+   *
+   * @return java.sql.Connection object
+   * @throws ClassNotFoundException if the class cannot be located
+   * @throws SQLException if a database access error occurs or the url is null
+   */
+  public Connection getConnection() throws ClassNotFoundException, SQLException, IOException {
+<span class="nc" id="L34">    Properties properties = new Properties();</span>
+<span class="nc" id="L35">    String user = null, pass = null, url = null, driver = null;</span>
+<span class="nc" id="L36">    String absoluteLocationOfCredentials = &quot;resources/credentials.properties&quot;;</span>
+<span class="nc" id="L37">    LOGGER.info(&quot;Trying to retrieve credentials from file located in : \n&quot;</span>
+<span class="nc" id="L38">        + System.getProperty(&quot;user.dir&quot;) + &quot;/&quot; + absoluteLocationOfCredentials);</span>
+<span class="nc" id="L39">    FileInputStream fileInputStream = null;</span>
+    try {
+<span class="nc" id="L41">      fileInputStream = new FileInputStream(absoluteLocationOfCredentials);</span>
+<span class="nc" id="L42">      properties.load(fileInputStream);</span>
+<span class="nc" id="L43">      user = properties.getProperty(&quot;username&quot;);</span>
+<span class="nc" id="L44">      pass = properties.getProperty(&quot;password&quot;);</span>
+<span class="nc" id="L45">      url = properties.getProperty(&quot;url&quot;);</span>
+<span class="nc" id="L46">      driver = properties.getProperty(&quot;driver&quot;);</span>
+<span class="nc" id="L47">      LOGGER.info(&quot;Create DB connection&quot;);</span>
+<span class="nc" id="L48">      Class.forName(driver);</span>
+<span class="nc" id="L49">    } catch (Exception e) {</span>
+<span class="nc" id="L50">      e.printStackTrace();</span>
+<span class="nc" id="L51">      LOGGER.error(&quot;Could not find credentials file to connect to database.&quot;);</span>
+    } finally {
+<span class="nc" id="L53">      closeFileInputStream(fileInputStream);</span>
+<span class="nc" id="L54">      return DriverManager.getConnection(url, user, pass);</span>
+    }
+  }
+
+  /**
+   * Close a connection to a database.
+   *
+   * @param con is a java.sql.Connection object created in getConnection() methode
+   */
+  public void closeConnection(Connection con) {
+<span class="nc bnc" id="L64" title="All 2 branches missed.">    if (con != null) {</span>
+      try {
+<span class="nc" id="L66">        con.close();</span>
+<span class="nc" id="L67">        LOGGER.info(&quot;Closing DB connection&quot;);</span>
+<span class="nc" id="L68">      } catch (SQLException e) {</span>
+<span class="nc" id="L69">        LOGGER.error(&quot;Error while closing connection&quot;, e);</span>
+<span class="nc" id="L70">      }</span>
+    }
+<span class="nc" id="L72">  }</span>
+
+  /**
+   * Close a statement made to a database.
+   *
+   * @param ps is the PreparedStatement object to be closed
+   */
+  public void closePreparedStatement(PreparedStatement ps) {
+<span class="nc bnc" id="L80" title="All 2 branches missed.">    if (ps != null) {</span>
+      try {
+<span class="nc" id="L82">        ps.close();</span>
+<span class="nc" id="L83">        LOGGER.info(&quot;Closing Prepared Statement&quot;);</span>
+<span class="nc" id="L84">      } catch (SQLException e) {</span>
+<span class="nc" id="L85">        LOGGER.error(&quot;Error while closing prepared statement&quot;, e);</span>
+<span class="nc" id="L86">      }</span>
+    }
+<span class="nc" id="L88">  }</span>
+
+  /**
+   * Close a Result Set made by a PreparedStatement.
+   *
+   * @param rs is the ResultSet to be closed
+   */
+  public void closeResultSet(ResultSet rs) {
+<span class="nc bnc" id="L96" title="All 2 branches missed.">    if (rs != null) {</span>
+      try {
+<span class="nc" id="L98">        rs.close();</span>
+<span class="nc" id="L99">        LOGGER.info(&quot;Closing Result Set&quot;);</span>
+<span class="nc" id="L100">      } catch (SQLException e) {</span>
+<span class="nc" id="L101">        LOGGER.error(&quot;Error while closing result set&quot;, e);</span>
+<span class="nc" id="L102">      }</span>
+    }
+<span class="nc" id="L104">  }</span>
+
+  public void closeFileInputStream(FileInputStream fileInputStream) {
+<span class="nc bnc" id="L107" title="All 2 branches missed.">    if (fileInputStream != null) {</span>
+      try {
+<span class="nc" id="L109">        fileInputStream.close();</span>
+<span class="nc" id="L110">        LOGGER.info(&quot;Closing File Input Stream&quot;);</span>
+<span class="nc" id="L111">      } catch (IOException e) {</span>
+<span class="nc" id="L112">        LOGGER.error(&quot;Error while closing FileInputStream&quot;, e);</span>
+<span class="nc" id="L113">      }</span>
+    }
+<span class="nc" id="L115">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
