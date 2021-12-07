@@ -1,6 +1,5 @@
 package com.parkit.parkingsystem.model;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.time.LocalDateTime;
 
@@ -24,12 +23,11 @@ public class Ticket {
     this.id = id;
   }
 
-  @SuppressFBWarnings("EI_EXPOSE_REP")
   public ParkingSpot getParkingSpot() {
     return parkingSpot;
   }
 
-  @SuppressFBWarnings("EI_EXPOSE_REP2")
+
   public void setParkingSpot(ParkingSpot parkingSpot) {
     this.parkingSpot = parkingSpot;
   }

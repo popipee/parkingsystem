@@ -10,7 +10,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -27,7 +27,6 @@ public class TicketDao {
    * @param ticket is the ticket object to be saved. Could be found in the model package.
    * @return a boolean which is true if the operation went well.
    */
-  @SuppressFBWarnings("DLS_DEAD_LOCAL_STORE")
   public boolean saveTicket(Ticket ticket) {
     Connection con = null;
     PreparedStatement ps = null;
